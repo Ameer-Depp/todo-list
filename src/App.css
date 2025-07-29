@@ -36,3 +36,31 @@
     transform: rotate(360deg);
   }
 }
+.todos {
+  transition: all 0.2s !important;
+}
+.todos:hover {
+  padding-bottom: 20px;
+  padding-top: 20px;
+}
+
+.icon-button:hover {
+  background-color: rgb(51, 29, 97) !important;
+}
+
+/* ==== CUSTOM FONTS ====*/
+@font-face {
+  font-family: a;
+  src: url(/public/fonts/Tinos-Regular.ttf);
+}
+
+@font-face {
+  font-family: a-thick;
+  src: url(/public/fonts/Tinos-Bold.ttf);
+}
+
+@font-face {
+  font-family: a-italic;
+  src: url(/public/fonts/Tinos-Italic.ttf);
+}
+/* ==== CUSTOM FONTS ====*/
