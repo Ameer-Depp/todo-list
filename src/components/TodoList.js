@@ -13,7 +13,7 @@ export default function TodoList() {
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    const getAllTodos = JSON.parse(localStorage.getItem("todos"));
+    const getAllTodos = JSON.parse(localStorage.getItem("todos")) ?? [];
     setTodoList(getAllTodos);
   }, []);
 
