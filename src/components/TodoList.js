@@ -1,32 +1,56 @@
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Todo from "./Todo";
 import AddTodo from "./AddTodo";
 import { v4 as uuidv4 } from "uuid";
-
-const todosList = [
-  { id: uuidv4(), content: "create new website", isFinished: false },
-  { id: uuidv4(), content: "create new backend", isFinished: false },
-  { id: uuidv4(), content: "do dishes", isFinished: false },
-];
+import { TodosContext } from "../contexts/TodosContext";
+import { useEffect } from "react";
 
 export default function TodoList() {
-  const [todoList, setTodoList] = useState(todosList);
+  const { setTodoList, todoList } = useContext(TodosContext);
   const [inputTodo, setInputTodo] = useState("");
+  const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    const getAllTodos = JSON.parse(localStorage.getItem("todos"));
+    setTodoList(getAllTodos);
+  }, []);
 
   const addTodo = (content) => {
     const newTodo = {
       id: uuidv4(),
       content: content,
-      isFinished: false
+      isFinished: false,
     };
-    setTodoList([...todoList, newTodo]);
+    const addedTodos = [...todoList, newTodo];
+    setTodoList(addedTodos);
+    localStorage.setItem("todos", JSON.stringify(addedTodos));
   };
 
-  const listOfTodos = todoList.map((t) => {
-    return <Todo key={t.id} content={t.content} isFinished={t.isFinished} />;
+  const finishedTodos = todoList.filter((t) => {
+    return t.isFinished;
   });
+  const notFinishedTodos = todoList.filter((t) => {
+    return !t.isFinished;
+  });
+
+  let todosToBeRendered = todoList;
+  if (filter === "done") {
+    todosToBeRendered = finishedTodos;
+  } else if (filter === "still") {
+    todosToBeRendered = notFinishedTodos;
+  } else {
+    todosToBeRendered = todoList;
+  }
+  let listOfTodos;
+  if (todosToBeRendered.length === 0) {
+    listOfTodos = <h3>there are no Todos!</h3>;
+  } else {
+    listOfTodos = todosToBeRendered.map((t) => {
+      return <Todo key={t.id} todoId={t.id} />;
+    });
+  }
 
   return (
     <div
@@ -43,7 +67,12 @@ export default function TodoList() {
         <hr />
 
         <div style={{ margin: "20px 0" }}>
-          <ToggleButtonGroup exclusive aria-label="todo filter">
+          <ToggleButtonGroup
+            value={filter}
+            onChange={(event, newFilter) => setFilter(newFilter)}
+            exclusive
+            aria-label="todo filter"
+          >
             <ToggleButton value="all" aria-label="all todos">
               All
             </ToggleButton>
@@ -56,9 +85,13 @@ export default function TodoList() {
           </ToggleButtonGroup>
         </div>
 
-        <div style={{ marginBottom: "20px" }}>{listOfTodos}</div>
+        <div
+          style={{ marginBottom: "20px", overflow: "auto", maxHeight: "380px" }}
+        >
+          {listOfTodos}
+        </div>
 
-        <AddTodo 
+        <AddTodo
           inputTodo={inputTodo}
           setInputTodo={setInputTodo}
           onAddTodo={addTodo}
