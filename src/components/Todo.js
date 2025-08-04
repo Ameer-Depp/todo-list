@@ -11,10 +11,13 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import { SnackBarContext } from "../contexts/SnackBarContext";
 
 export default function Todo({ todoId }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const { showHideSnack } = useContext(SnackBarContext);
+
   const [updatedTodo, setUpdatedTodo] = useState("");
   const { todoList, setTodoList } = useContext(TodosContext);
 
@@ -29,6 +32,11 @@ export default function Todo({ todoId }) {
     });
     setTodoList(updatedTodo);
     localStorage.setItem("todos", JSON.stringify(updatedTodo));
+    const isNowFinished = !currentTodo.isFinished;
+    const message = isNowFinished
+      ? "Todo completed! 🎉"
+      : "Todo marked as incomplete";
+    showHideSnack(message, "success");
   }
 
   // If todo not found, don't render anything
@@ -48,6 +56,7 @@ export default function Todo({ todoId }) {
 
     setTodoList(newList);
     localStorage.setItem("todos", JSON.stringify(newList));
+    showHideSnack("Todo deleted successfully!", "error");
   }
 
   // Update functionality
@@ -67,6 +76,7 @@ export default function Todo({ todoId }) {
       return t;
     });
     setTodoList(updatedTodoList);
+    showHideSnack("Todo updated successfully!", "info");
 
     setShowUpdateDialog(false); // Close dialog after update
   }

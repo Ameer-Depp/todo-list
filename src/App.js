@@ -1,10 +1,11 @@
 import { createTheme, ThemeProvider } from "@mui/material";
 import "./App.css";
 import TodoList from "./components/TodoList";
-import AddTodo from "./components/AddTodo";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { TodosContext } from "./contexts/TodosContext";
+import MySnackBar from "./components/MySnackBar";
+import { SnackBarContext } from "./contexts/SnackBarContext";
 
 const theme = createTheme({
   typography: {
@@ -20,24 +21,46 @@ const todosList = [
 
 function App() {
   const [todoList, setTodoList] = useState(todosList);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("success");
+
+  function showHideSnackBar(msg, sev = "success") {
+    setMessage(msg);
+    setSeverity(sev);
+    setOpen(true);
+    setTimeout(() => {
+      setOpen(false);
+    }, 2000);
+  }
+
   return (
     <ThemeProvider theme={theme}>
-      <div
-        className="App"
-        style={{
-          backgroundColor: "#2b2b36",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
+      <SnackBarContext.Provider
+        value={{
+          showHideSnack: showHideSnackBar,
+          message,
+          severity,
         }}
       >
-        <TodosContext.Provider
-          value={{ todoList: todoList, setTodoList: setTodoList }}
+        <div
+          className="App"
+          style={{
+            backgroundColor: "#2b2b36",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+          }}
         >
-          <TodoList />
-        </TodosContext.Provider>
-      </div>
+          <MySnackBar open={open} message={message} severity={severity} />
+          <TodosContext.Provider
+            value={{ todoList: todoList, setTodoList: setTodoList }}
+          >
+            <TodoList />
+          </TodosContext.Provider>
+        </div>
+      </SnackBarContext.Provider>
     </ThemeProvider>
   );
 }
